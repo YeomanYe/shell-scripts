@@ -97,28 +97,17 @@ echo ">>> 临时文件"
 run_cleanup "系统临时文件" "/tmp" "rm -rf /tmp/com.apple.* 2>/dev/null || true"
 run_cleanup "用户临时文件" "$TMPDIR" "rm -rf $TMPDIR/* 2>/dev/null || true"
 
-# 9. 旧下载文件（可选 - 询问用户）
-echo ""
-echo ">>> 下载目录中的旧文件（超过30天）"
-if [[ "$DRY_RUN" == "true" ]]; then
-    echo -e "${YELLOW}待删除文件:${NC}"
-    find "$HOME/Downloads" -type f -mtime +30 -ls 2>/dev/null | head -20 || true
-else
-    find "$HOME/Downloads" -type f -mtime +30 -delete 2>/dev/null || true
-    echo -e "${GREEN}已清理${NC}"
-fi
-
 # 10. iOS 设备日志
 echo ""
 echo ">>> iOS 日志"
 run_cleanup "iOS Device Logs" "$HOMELibrary/Logs/CoreSimulator" "rm -rf $HOME/Library/Logs/CoreSimulator/*"
 
-# 11. 字体缓存
+# 10. 字体缓存
 echo ""
 echo ">>> 字体缓存"
 run_cleanup "字体缓存" "$HOMELibrary/Caches/FontRegistry" "rm -rf $HOME/Library/Caches/FontRegistry/*"
 
-# 12. 清理 macOS 终端历史
+# 11. 清理 macOS 终端历史
 echo ""
 echo ">>> 终端历史"
 run_cleanup "Bash History" "$HOME/.bash_history" "> $HOME/.bash_history"
