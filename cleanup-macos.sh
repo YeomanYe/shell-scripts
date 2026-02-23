@@ -97,17 +97,22 @@ echo ">>> 临时文件"
 run_cleanup "系统临时文件" "/tmp" "rm -rf /tmp/com.apple.* 2>/dev/null || true"
 run_cleanup "用户临时文件" "$TMPDIR" "rm -rf $TMPDIR/* 2>/dev/null || true"
 
+# 9. 系统缓存
+echo ""
+echo ">>> 系统缓存"
+run_cleanup "用户缓存目录" "$HOMELibrary/Caches" "rm -rf $HOME/Library/Caches/*"
+
 # 10. iOS 设备日志
 echo ""
 echo ">>> iOS 日志"
 run_cleanup "iOS Device Logs" "$HOMELibrary/Logs/CoreSimulator" "rm -rf $HOME/Library/Logs/CoreSimulator/*"
 
-# 10. 字体缓存
+# 11. 字体缓存
 echo ""
 echo ">>> 字体缓存"
 run_cleanup "字体缓存" "$HOMELibrary/Caches/FontRegistry" "rm -rf $HOME/Library/Caches/FontRegistry/*"
 
-# 11. 清理 macOS 终端历史
+# 12. 清理 macOS 终端历史
 echo ""
 echo ">>> 终端历史"
 run_cleanup "Bash History" "$HOME/.bash_history" "> $HOME/.bash_history"
