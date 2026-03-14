@@ -130,9 +130,12 @@ prompt_selection() {
     echo "       macOS 磁盘清理脚本"
     echo "========================================"
     echo ""
-    echo "请选择要清理的项目（输入数字，多个用空格分隔）："
-    echo "  输入 'a' 清理所有项目"
-    echo "  输入 'q' 退出"
+    echo "请选择要清理的项目："
+    echo "  - 多个数字用空格或逗号分隔: 1 3 5 或 1,3,5"
+    echo "  - 支持范围选择: 1-5 (选择1到5)"
+    echo "  - 可混合使用: 1-3,5,7-9"
+    echo "  - 输入 'a' 清理所有项目"
+    echo "  - 输入 'q' 退出"
     echo ""
     echo "可用项目:"
 
@@ -156,16 +159,39 @@ prompt_selection() {
             SELECTED_INDICES+=($index)
         done
     else
-        # 解析用户输入
-        for num in $selection; do
-            if [[ "$num" =~ ^[0-9]+$ && "$num" -ge 1 && "$num" -le $total ]]; then
-                SELECTED_INDICES+=($((num - 1)))
+        local normalized_selection
+        normalized_selection=$(echo "$selection" | tr ',' ' ')
+        for part in $normalized_selection; do
+            if [[ "$part" =~ ^([0-9]+)-([0-9]+)$ ]]; then
+                local start=${BASH_REMATCH[1]}
+                local end=${BASH_REMATCH[2]}
+                if [[ $start -le $end && $start -ge 1 && $end -le $total ]]; then
+                    for ((num=start; num<=end; num++)); do
+                        SELECTED_INDICES+=($((num - 1)))
+                    done
+                fi
+            elif [[ "$part" =~ ^[0-9]+$ && "$part" -ge 1 && "$part" -le $total ]]; then
+                SELECTED_INDICES+=($((part - 1)))
             fi
         done
+        local unique_indices=()
+        for idx in "${SELECTED_INDICES[@]}"; do
+            local found=false
+            for uidx in "${unique_indices[@]}"; do
+                if [[ $idx -eq $uidx ]]; then
+                    found=true
+                    break
+                fi
+            done
+            if [[ "$found" == "false" ]]; then
+                unique_indices+=($idx)
+            fi
+        done
+        SELECTED_INDICES=("${unique_indices[@]}")
     fi
 
     if [[ ${#SELECTED_INDICES[@]} -eq 0 ]]; then
-        echo -e "${RED}未选择任何项目${NC}"
+        echo -e "${RED}未选择任何有效项目${NC}"
         exit 1
     fi
 
